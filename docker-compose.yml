@@ -36,7 +36,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.services.guacamole.loadbalancer.server.port=8080 # Container port
-      - traefik.http.routers.guacamole.rule=Host(`guac.ht-bg.com`) # URL
+      - traefik.http.routers.guacamole.rule=Host(`${DOMAIN}`) # URL
       - traefik.http.routers.guacamole.tls.certresolver=letsencrypt # Cert resolver declared as traefik flag
       - traefik.http.routers.guacamole.entrypoints=https # Incoming entrypoint
       - traefik.http.routers.guacamole.middlewares=authelia@docker
