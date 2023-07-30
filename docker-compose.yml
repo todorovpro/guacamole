@@ -1,0 +1,48 @@
+version: '2.1'
+
+services:
+
+  guacd:
+    image: guacamole/guacd:${GUACAMOLE_VERSION}
+    restart: unless-stopped
+    volumes:
+      - ./drive:/drive
+
+  mysql:
+    build:
+      context: ./build-mysql
+      args:
+        GUACAMOLE_VERSION: ${GUACAMOLE_VERSION}
+        MYSQL_VERSION: ${MYSQL_VERSION}
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - dbdata:/var/lib/mysql
+
+  guacamole:
+    image: guacamole/guacamole:${GUACAMOLE_VERSION}
+    restart: unless-stopped
+    environment:
+      GUACD_HOSTNAME: guacamole-guacd-1
+      MYSQL_HOSTNAME: guacamole-mysql-1
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      REMOTE_IP_VALVE_ENABLED: true
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.guacamole.loadbalancer.server.port=8080 # Container port
+      - traefik.http.routers.guacamole.rule=Host(`guac.ht-bg.com`) # URL
+      - traefik.http.routers.guacamole.tls.certresolver=letsencrypt # Cert resolver declared as traefik flag
+      - traefik.http.routers.guacamole.entrypoints=https # Incoming entrypoint
+      - traefik.http.routers.guacamole.middlewares=authelia@docker
+
+networks:
+  default:
+    name: traefik-proxy
+volumes:
+  dbdata:
