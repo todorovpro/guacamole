@@ -1,3 +1,1 @@
-Initial commit# guacamole
-# guacamole
-# guacamole
+Apache Guacamole in Docker Compose file
