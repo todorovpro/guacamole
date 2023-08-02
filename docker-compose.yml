@@ -7,11 +7,13 @@ services:
     restart: unless-stopped
     volumes:
       - ./drive:/drive
-    network_mode: "service:guacamole"
+    network_mode: "service:guacamole" # links directly to localhost in "guacamole" container that is effective way to escape collisions if you have multiple "mysql" containers with the same hostname in the same network - traefik-proxy for example
 
   mysql:
     build:
-      context: ./build-mysql
+      # building mysql from official image with only added initial guacamole db to initialize on first start
+      # context: ./build-mysql # you can use this line if you dont have git installed, you will have to download build-mysql folder (there is only Dockerfile in it)
+      context: https://github.com/todorovpro/guacamole.git#:build-mysql # you can use this if you have git, without downloading build-mysql folder, it will grab it from github
       args:
         GUACAMOLE_VERSION: ${GUACAMOLE_VERSION}
         MYSQL_VERSION: ${MYSQL_VERSION}
@@ -23,7 +25,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - dbdata:/var/lib/mysql
-    network_mode: "service:guacamole"
+    network_mode: "service:guacamole" # links directly to localhost in "guacamole" container that is effective way to escape collisions if you have multiple "mysql" containers with the same hostname in the same network - traefik-proxy for example
 
 
   guacamole:
