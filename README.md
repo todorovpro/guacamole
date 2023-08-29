@@ -15,3 +15,5 @@ docker-compose up -d
 
 go to https://yourdomain.com/guacamole
 
+TODO:
+add Traefik
